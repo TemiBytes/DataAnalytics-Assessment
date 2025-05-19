@@ -1,17 +1,16 @@
-Customer Insights Analytics - SQL Asessment
+Customer Insights Analytics - SQL Assessment
 
 This repository contains SQL solutions designed to evaluate technical proficiency, analytical thinking, and real-world business logic application using SQL.
 
 Each query addresses a specific business scenario using MySQL best practices :
 
-- Data integrity through null handling, filtering, and aggregation safeguards
-- with a focus on readibilty, DRY code, accuracy, and performance optimization with Common Table Expressions (CTE) and conditional logics.
+- Data integrity through null handling, filtering, and aggregation safeguards with a focus on readability, DRY code, accuracy, and performance optimization with Common Table Expressions (CTE) and conditional logics.
 
 --------------------------------
 
 ## Per-Question Explanations
 
-## Q1. High Value Customers with Multiple Product
+## Q1. High Value Customers with Multiple Products
 
 **Objective**: Identify customers with at least one funded savings plan and one funded investment plan, then rank them based on their total deposits.
 
@@ -32,16 +31,16 @@ Each query addresses a specific business scenario using MySQL best practices :
 ## Q2. Transaction Frequency Analysis
 
 **Objective**: Analyze how frequently customers perform transactions on a monthly basis and classify them into 
-high , medium and low frequency
+high, medium, and low frequency
 
 **Approach**:
-- Created three CTES to calculate monthly transactions, average monthly transaction, and frequency category for each customer
+- Created three CTES to calculate monthly transactions, average monthly transactions, and frequency category for each customer
 - Aggregated customer transaction counts per month using `DATE_FORMAT(s.transaction_date, '%Y-%m')` to normalize by month.
 - Classified users using:
   - High Frequency (≥10/month)
   - Medium Frequency (3–9/month)
   - Low Frequency (≤2/month)
-- my final output was grouped by frequency category to give me the customer count and average monthly transactions based on each frequency category.
+- My final output was grouped by frequency category to give me the customer count and average monthly transactions based on each frequency category.
 - Used `ORDER BY FIELD(...)` to sort frequency categories in a custom logical order instead of default alphabetical sorting.
 
 
@@ -49,8 +48,8 @@ high , medium and low frequency
 
 - `Avoiding Inflated Transaction Counts in Frequency Analysis`.
 
-**how I resolved it**: 
-- I initally considered counting all rows from the `savings_savingsaccount` but I realized this will skew the frequencies. So i ensured only confirmed transactions were counted, and normalized over unique months using `DATE_FORMAT()`.
+**How I resolved it**: 
+- I initially considered counting all rows from the `savings_savingsaccount`, but I realized this would skew the frequencies. So I ensured only confirmed transactions were counted, and normalized over unique months using `DATE_FORMAT()`.
 
 
 ![Transaction Frequency Chart](https://drive.google.com/uc?export=view&id=1SJbPfNXHJMH-Mm_V4ZVK0P7xZ-yA28qw)
@@ -59,12 +58,12 @@ high , medium and low frequency
 
 ## Question 3. Account Inactivity Alert
 
-**Objective**: find all active accounts (savings or investments) with no transactions in the last 1 year (365 days) 
+**Objective**: Find all active accounts (savings or investments) with no transactions in the last 1 year (365 days) 
 
 **Approach**:
 - Defined a CTE to label plan types (`Savings`, `Investment`) 
-- filtered only **active** plans based on (`is_archived = 0 AND is_deleted = 0`) which means the accounts have not been archived or deleted.
-- Joined the CTE with `savings_savingsaccount` to find last transaction date 
+- filtered only **active** plans based on (`is_archived = 0 AND is_deleted = 0`), which means the accounts have not been archived or deleted.
+- Joined the CTE with `savings_savingsaccount` to find the last transaction date 
 - restricted the results of the join to `confirmed_amount > 0` to ensure we're tracking only successful inflows.
 - Used `MAX(transaction_date)` and `DATEDIFF()` to compute inactivity duration.
 - Filtered results to show only those plans that haven’t had any inflow for **over a year**.
@@ -74,15 +73,15 @@ high , medium and low frequency
 - `Defining What Makes an Account “Active” `
 
 **Assumptions**: 
-- There were two interperations I defined:
+- There were two interpretations I defined:
 - 1. System-active: plans that are not archived or deleted
 - 2. Behaviorally-active: plans with at least one confirmed transaction
 
-- I included the two logic into my query by setting `is_archived = 0`,`is_deleted = 0`. Then I adopted the behavioral-active definition, using an `INNER JOIN` and `confirmed_amount > 0` because I was working under the assumption that an “active” plan must have had **at least one confirmed inflow transaction** in the past.
+- I included the two logics into my query by setting `is_archived = 0`,`is_deleted = 0`. Then I adopted the behavioral-active definition, using an `INNER JOIN` and `confirmed_amount > 0` because I was working under the assumption that an “active” plan must have had **at least one confirmed inflow transaction** in the past.
 
 -If I had used a `LEFT JOIN`, it would have included plans with no transactions at all. However, those rows would have had `NULL` for `transaction_date`, and thus been excluded later by the `HAVING inactivity_days > 365` clause. 
 
-- However, it is important to note that while using both kind of Joins could eventually give the same output based on my query logic, an `INNER JOIN` or just `JOIN` (which also means inner join) was more efficient due to the fewer rows processed, and accurate as it algined with my behavioral definition of active accounts.
+- However, it is important to note that while using both kind of Joins could eventually give the same output based on my query logic, an `INNER JOIN` or just `JOIN` (which also means inner join) was more efficient due to the fewer rows processed, and accurate as it aligned with my behavioral definition of active accounts.
 
 ---------------------------------
 
@@ -106,8 +105,8 @@ high , medium and low frequency
 - `Handling Zero-Month Tenure in CLV Calculation`
 - `Handling Null Values in CLV Calculation`
 
-**how I resolved it**: 
-- I used `GREATEST(TIMESTAMPDIFF(MONTH, u.date_joined, CURDATE()),1) AS tenure_months`. From a marketing and customer analytics standpoint, assuming a minimum tenure of 1 month for users with tenure = 0 is not only justifiable, it’s actually practically necessary in this context.
+**How I resolved it**: 
+- I used `GREATEST(TIMESTAMPDIFF(MONTH, u.date_joined, CURDATE()),1) AS tenure_months`. From a marketing and customer analytics standpoint, assuming a minimum tenure of 1 month for users with tenure = 0 is not only justifiable, it’s practically necessary in this context.
 
 - Some customers had NULL values in their transaction count or average profit, which made their CLV come out as NULL. I used `IFNULL(..., 0)` to return 0 instead of NULL, and `FORMAT(..., 2)` to display the CLV cleanly.
 
