@@ -2,9 +2,9 @@ Customer Insights Analytics - SQL Assessment
 
 This repository contains SQL solutions designed to evaluate technical proficiency, analytical thinking, and real-world business logic application using SQL.
 
-Each query addresses a specific business scenario using MySQL best practices :
+Each query addresses a specific business scenario using MySQL best practices which includes:
 
-- Data integrity through null handling, filtering, and aggregation safeguards with a focus on readability, DRY code, accuracy, and performance optimization with Common Table Expressions (CTE) and conditional logics.
+- data integrity through null handling, filtering, and aggregation safeguards with a focus on readability, DRY code, accuracy, and performance optimization with Common Table Expressions (CTE) and conditional logics.
 
 --------------------------------
 
